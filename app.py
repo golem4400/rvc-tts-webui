@@ -113,13 +113,13 @@ def load_hubert():
     return hubert_model.eval()
 
 
-print("Loading hubert model...")
+print("Đang tải mẫu hubert...")
 hubert_model = load_hubert()
-print("Hubert model loaded.")
+print("Mẫu Hubert đã được nạp.")
 
-print("Loading rmvpe model...")
+print("Đang tải mẫu rmvpe...")
 rmvpe_model = RMVPE("rmvpe.pt", config.is_half, config.device)
-print("rmvpe model loaded.")
+print("Mẫu rmvpe đã được nạp.")
 
 
 def tts(
@@ -144,7 +144,7 @@ def tts(
     print(f"F0: {f0_method}, Key: {f0_up_key}, Index: {index_rate}, Protect: {protect}")
     try:
         if limitation and len(tts_text) > 280:
-            print("Error: Text too long")
+            print("Lỗi: Text quá dài")
             return (
                 f"Text characters should be at most 280 in this huggingface space, but got {len(tts_text)} characters.",
                 None,
@@ -213,9 +213,9 @@ def tts(
         )
     except EOFError:
         info = (
-            "It seems that the edge-tts output is not valid. "
-            "This may occur when the input text and the speaker do not match. "
-            "For example, maybe you entered Japanese (without alphabets) text but chose non-Japanese speaker?"
+            "Có vẻ như edge-tts không ra kết quả"
+            "Nó có thể là do khi văn bản và giọng nói không khớp nhau. "
+            "Ví dụ, có thể bạn nhập Tiếng Việt nhưng lại chọn không phải giọng đọc tiếng Việt?"
         )
         print(info)
         return info, None, None
@@ -226,11 +226,10 @@ def tts(
 
 
 initial_md = """
-# RVC text-to-speech webui
+# RVC chuyển văn bản sang giọng đọc
 
-This is a text-to-speech webui of RVC models.
 
-Input text ➡[(edge-tts)](https://github.com/rany2/edge-tts)➡ Speech mp3 file ➡[(RVC)](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)➡ Final output
+Nhập văn bản ➡[(edge-tts)](https://github.com/rany2/edge-tts)➡ Tệp âm thanh ➡[(RVC)](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)➡ Kết quả
 """
 
 app = gr.Blocks()
@@ -240,12 +239,12 @@ with app:
         with gr.Column():
             model_name = gr.Dropdown(label="Model", choices=models, value=models[0])
             f0_key_up = gr.Number(
-                label="Transpose (the best value depends on the models and speakers)",
+                label="Chuyển đổi (giá trị tốt nhất phụ thuộc vào models và speaker)",
                 value=0,
             )
         with gr.Column():
             f0_method = gr.Radio(
-                label="Pitch extraction method (pm: very fast, low quality, rmvpe: a little slow, high quality)",
+                label="Chọn thuật toán giải (pm: rất nhanh, chất lượng thấp, rmvpe: Hơi chậm, chất lượng cao)",
                 choices=["pm", "rmvpe"],  # harvest and crepe is too slow
                 value="rmvpe",
                 interactive=True,
@@ -261,33 +260,33 @@ with app:
                 minimum=0,
                 maximum=0.5,
                 label="Protect",
-                value=0.33,
+                value=0,
                 step=0.01,
                 interactive=True,
             )
     with gr.Row():
         with gr.Column():
             tts_voice = gr.Dropdown(
-                label="Edge-tts speaker (format: language-Country-Name-Gender)",
+                label="Chọn giọng đọc (Cấu trúc: ngôn ngữ-Quốc gia-Tên-Giới tính)",
                 choices=tts_voices,
-                allow_custom_value=False,
-                value="ja-JP-NanamiNeural-Female",
+                allow_custom_value=True,
+                value="en-AU-WilliamNeural-Male",
             )
             speed = gr.Slider(
                 minimum=-100,
                 maximum=100,
-                label="Speech speed (%)",
+                label="Tốc độ đọc (%)",
                 value=0,
-                step=10,
+                step=5,
                 interactive=True,
             )
-            tts_text = gr.Textbox(label="Input Text", value="これは日本語テキストから音声への変換デモです。")
+            tts_text = gr.Textbox(label="Nhập văn bản", value="Xin chào đây là thử nghiệm chữ thành tiếng nói")
         with gr.Column():
-            but0 = gr.Button("Convert", variant="primary")
-            info_text = gr.Textbox(label="Output info")
+            but0 = gr.Button("Chuyển đổi", variant="primary")
+            info_text = gr.Textbox(label="Thông số đầu ra")
         with gr.Column():
             edge_tts_output = gr.Audio(label="Edge Voice", type="filepath")
-            tts_output = gr.Audio(label="Result")
+            tts_output = gr.Audio(label="Kết quả")
         but0.click(
             tts,
             [
@@ -362,4 +361,4 @@ with app:
         )
 
 
-app.launch(share=True)
+app.launch(Share=True)
